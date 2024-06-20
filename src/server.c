@@ -6,13 +6,26 @@
 /*   By: trischma <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 15:36:42 by hrischma          #+#    #+#             */
-/*   Updated: 2024/06/20 11:23:01 by trischma         ###   ########.fr       */
+/*   Updated: 2024/06/20 11:52:39 by trischma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // #define _XOPEN_SOURCE 700
 #include "../include/minitalk.h"
 
+static void	reset_buffer(char *buffer, int *buf_index)
+{
+	buffer[*buf_index] = '\0';
+	*buf_index = 0;
+}
+
+static void	handle_signal_end(pid_t *client_pid, char *buffer, int *buf_index)
+{
+	reset_buffer(buffer, buf_index);
+	kill(*client_pid, SIGUSR2);
+	*client_pid = 0;
+	ft_printf("%s\033[1;32m\nMessage received successfully!\033[0m\n", buffer);
+}
 
 static void	action(int sig, siginfo_t *info, void *context)
 {
@@ -31,11 +44,7 @@ static void	action(int sig, siginfo_t *info, void *context)
 		i = 0;
 		if (!c)
 		{
-			buffer[buf_index] = '\0';
-			buf_index = 0;
-			kill(client_pid, SIGUSR2);
-			client_pid = 0;
-			ft_printf("%s\033[1;32m\nMessage received: \033[0m\n", buffer);
+			handle_signal_end(&client_pid, buffer, &buf_index);
 			return ;
 		}
 		buffer[buf_index++] = c;

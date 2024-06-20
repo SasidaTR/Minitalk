@@ -4,33 +4,37 @@ SERVER_BONUS_SRCS	= src/server_bonus.c
 CLIENT_BONUS_SRCS	= src/client_bonus.c
 HEADERS		= include/minitalk.h
 
-CC			= cc -Wall -Werror -Wextra
-CC_FLAGS	= -Llibft -lft
+CC			= cc
+CFLAGS		= -Wall -Werror -Wextra -Iinclude
+LDFLAGS		= -Llibft -lft
+
+OBJS		= ${SERVER_SRCS:.c=.o} ${CLIENT_SRCS:.c=.o}
+BONUS_OBJS	= ${SERVER_BONUS_SRCS:.c=.o} ${CLIENT_BONUS_SRCS:.c=.o}
 
 %.o: %.c ${HEADERS} libft/libft.a
-			${CC} -c $< -o $@
+			${CC} ${CFLAGS} -c $< -o $@
 
 all:		libft server client
 
-bonus:		libft server client server_bonus client_bonus
+bonus:		libft server_bonus client_bonus
 
 libft:
 			@make -C libft
 
-server:		${SERVER_SRCS:.c=.o} libft
-			${CC} ${SERVER_SRCS} ${CC_FLAGS} -o server
+server:		src/server.o
+			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
 
-client:		${CLIENT_SRCS:.c=.o} libft
-			${CC} ${CLIENT_SRCS} ${CC_FLAGS} -o client
-			
-server_bonus:		${SERVER_BONUS_SRCS:.c=.o} libft
-			${CC} ${SERVER_BONUS_SRCS} ${CC_FLAGS} -o server_bonus
+client:		src/client.o
+			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
 
-client_bonus:		${CLIENT_BONUS_SRCS:.c=.o} libft
-			${CC} ${CLIENT_BONUS_SRCS} ${CC_FLAGS} -o client_bonus
+server_bonus:	src/server_bonus.o
+			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
+
+client_bonus:	src/client_bonus.o
+			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
 
 clean:
-			rm -rdf ${SERVER_SRCS:.c=.o} ${CLIENT_SRCS:.c=.o} ${SERVER_BONUS_SRCS:.c=.o} ${CLIENT_BONUS_SRCS:.c=.o}
+			rm -rdf ${OBJS} ${BONUS_OBJS}
 			@make clean -C libft
 
 fclean:		clean
