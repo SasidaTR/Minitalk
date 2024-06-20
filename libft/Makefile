@@ -7,7 +7,7 @@ OBJ = ${SRC:.c=.o}
 NAME = libft.a
 CFLAGS = -Wall -Werror -Wextra -I ./
 
-.c.o:
+%.o: %.c
 		cc ${CFLAGS} -c $< -o $@
 
 ${NAME}: ${OBJ}

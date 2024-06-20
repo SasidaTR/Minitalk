@@ -1,46 +1,49 @@
-SERVER_SRCS	= src/server.c
-CLIENT_SRCS	= src/client.c
-SERVER_BONUS_SRCS	= src/server_bonus.c
-CLIENT_BONUS_SRCS	= src/client_bonus.c
-HEADERS		= include/minitalk.h
+CC = cc -Wall -Werror -Wextra
+CC_FLAGS = -Llibft -lft
 
-CC			= cc
-CFLAGS		= -Wall -Werror -Wextra -Iinclude
-LDFLAGS		= -Llibft -lft
+SERVER_SRC = src/server.c
+CLIENT_SRC = src/client.c
+SERVER_BONUS_SRC = src/server_bonus.c
+CLIENT_BONUS_SRC = src/client_bonus.c
+SERVER_OBJ = $(SERVER_SRC:.c=.o)
+CLIENT_OBJ = $(CLIENT_SRC:.c=.o)
+SERVER_BONUS_OBJ = $(SERVER_BONUS_SRC:.c=.o)
+CLIENT_BONUS_OBJ = $(CLIENT_BONUS_SRC:.c=.o)
 
-OBJS		= ${SERVER_SRCS:.c=.o} ${CLIENT_SRCS:.c=.o}
-BONUS_OBJS	= ${SERVER_BONUS_SRCS:.c=.o} ${CLIENT_BONUS_SRCS:.c=.o}
+LIBFT = libft/libft.a
 
-%.o: %.c ${HEADERS} libft/libft.a
-			${CC} ${CFLAGS} -c $< -o $@
+%.o: %.c
+	${CC} -o $@ -c $<
 
-all:		libft server client
+all: libft server client
 
-bonus:		libft server_bonus client_bonus
+bonus: libft server client server_bonus client_bonus
 
-libft:
-			@make -C libft
+libft: $(LIBFT)
 
-server:		src/server.o
-			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
+$(LIBFT):
+	@make -C libft
 
-client:		src/client.o
-			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
+server: $(SERVER_OBJ) $(LIBFT)
+	${CC} ${SERVER_OBJ} ${CC_FLAGS} -o server
 
-server_bonus:	src/server_bonus.o
-			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
+client: $(CLIENT_OBJ) $(LIBFT)
+	${CC} ${CLIENT_OBJ} ${CC_FLAGS} -o client
 
-client_bonus:	src/client_bonus.o
-			${CC} ${CFLAGS} $< ${LDFLAGS} -o $@
+server_bonus: $(SERVER_BONUS_OBJ) $(LIBFT)
+	${CC} ${SERVER_BONUS_OBJ} ${CC_FLAGS} -o server_bonus
+
+client_bonus: $(CLIENT_BONUS_OBJ) $(LIBFT)
+	${CC} ${CLIENT_BONUS_OBJ} ${CC_FLAGS} -o client_bonus
 
 clean:
-			rm -rdf ${OBJS} ${BONUS_OBJS}
-			@make clean -C libft
+	rm -rdf ${SERVER_OBJ} ${CLIENT_OBJ} ${SERVER_BONUS_OBJ} ${CLIENT_BONUS_OBJ}
+	@make clean -C libft
 
-fclean:		clean
-			rm -rdf server client server_bonus client_bonus
-			@make fclean -C libft
+fclean: clean
+	rm -rdf server client server_bonus client_bonus
+	@make fclean -C libft
 
-re:			fclean all
+re: fclean all
 
-.PHONY:		all libft clean fclean re server client server_bonus client_bonus
+.PHONY: all clean fclean re
