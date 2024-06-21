@@ -6,7 +6,7 @@
 /*   By: trischma <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/03 15:36:34 by hrischma          #+#    #+#             */
-/*   Updated: 2024/06/21 10:44:59 by trischma         ###   ########.fr       */
+/*   Updated: 2024/06/21 11:14:03 by trischma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,19 +37,6 @@ char	*ft_fgets(char *str, int n, int fd)
 	return (str);
 }
 
-static void	action(int sig)
-{
-	static int	received = 0;
-
-	if (sig == SIGUSR1)
-		++received;
-	else
-	{
-		ft_printf("\033[1;32mReceived : %i\033[0m\n", received);
-		received = 0;
-	}
-}
-
 static void	mt_kill(int pid, char *str)
 {
 	int		i;
@@ -73,6 +60,19 @@ static void	mt_kill(int pid, char *str)
 	{
 		kill(pid, SIGUSR1);
 		usleep(500);
+	}
+}
+
+static void	action(int sig)
+{
+	static int	received = 0;
+
+	if (sig == SIGUSR1)
+		++received;
+	else
+	{
+		ft_printf("\033[1;32mReceived : %i\033[0m\n", received);
+		received = 0;
 	}
 }
 
